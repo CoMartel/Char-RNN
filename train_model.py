@@ -24,14 +24,16 @@ def sample(preds, temperature=1.0):
     return np.argmax(probas)
 
 
-def test_model(model, char_to_indices, indices_to_char, seed_string=" ", temperature=1.0, test_length=150):
+def test_model(model, char_to_indices, indices_to_char, seed_string=" ", temperature=1.0, test_length=150,keep_chars=50):
     """
     Higher temperatures correspond to more potentially creative sentences (at the cost of mistakes)
+    keep_chars correspond to the number of characters the network will keep as input.
+    This increase the testing speed, but a number too low can decrease performance
     """
     num_chars = len(char_to_indices.keys())
     for i in range(test_length):
-        test_in = np.zeros((1, len(seed_string), num_chars))
-        for t, char in enumerate(seed_string):
+        test_in = np.zeros((1, len(seed_string[-keep_chars:]), num_chars))
+        for t, char in enumerate(seed_string[-keep_chars:]):
             test_in[0, t, char_to_indices[char]] = 1
         # input 'goodby', desired output is 'oodbye' # possible todo: show that this holds for the model
         entire_prediction = model.predict(test_in, verbose=0)[0]
@@ -48,7 +50,7 @@ if __name__ == "__main__":
     # Random seed. Change to get different training results / speeds
     # origin = "obama2"  # used to name files saved as well
     # origin = "nietzsche"
-    origin = "sonnets"
+    origin = "python"
     seed = 2
 
     # LSTM parameters (todo: GRU and RNN are other options)
@@ -68,6 +70,7 @@ if __name__ == "__main__":
 
     # testing
     test_length = 150
+    keep_chars = 50
 
     # Select source
     if "nietzsche" in origin:
@@ -79,6 +82,8 @@ if __name__ == "__main__":
         text = open("data/sonnet.txt").read().lower() 
     elif "paulgraham" in origin:
         text = open("data/paulgraham.txt").read().lower()
+    elif "python" in origin:
+        text = open("data/generic.py").read().lower()
     else:  # add your own text! (something to do with sports would be interesting)
         raise NotImplementedError
 
@@ -97,7 +102,7 @@ if __name__ == "__main__":
     pickle.dump(char_to_indices, open("saved_models/{}c2i.p".format(origin), "wb"))
     pickle.dump(indices_to_char, open("saved_models/{}i2c.p".format(origin), "wb"))
 
-    # cut the text in semi-redundant sequences of maxlen characters (possible todo: try cuts of different sizes)
+    # cut the text in semi-redundant sequences of maxlen characters 
     sentences = []
     targets = []
     for i in range(0, len(text) - maxlen - 1, step):
@@ -125,12 +130,12 @@ if __name__ == "__main__":
     # model.add(LSTM(unit_size, input_shape=(maxlen, len(chars)), return_sequences=True))
     model.add(LSTM(unit_size, input_dim=num_chars, return_sequences=True))
     for i in range(num_layers - 1):
-        if dropout:  # as proposed by Zaremba et al. (may want to have dropout before first LSTM cell as well?)
+        if dropout:  # as proposed by Zaremba et al.
             model.add(Dropout(dropout))
         model.add(LSTM(unit_size, return_sequences=True))
     if dropout:
         model.add(Dropout(dropout))
-    model.add(TimeDistributed(Dense(num_chars)))  # todo: shouldn't have to be same size right?
+    model.add(TimeDistributed(Dense(num_chars)))  
     model.add(Activation('softmax'))
     model.compile(optimizer=optimizer,
                   loss='categorical_crossentropy',
@@ -144,12 +149,13 @@ if __name__ == "__main__":
     for i in range(training_epochs):
         print('-' * 10 + ' Iteration: {} '.format(i) + '-' * 10)
         outfile.write("\n" + '-' * 10 + ' Iteration: {} '.format(i) + '-' * 10 + "\n")
-        for temperature in [0.03, 0.1, 0.3, 1, 2]:
+        for temperature in [0.1, 0.3, 1, 2]:
             generated_string = test_model(model,
                                           char_to_indices=char_to_indices,
                                           indices_to_char=indices_to_char,
                                           temperature=temperature,
-                                          test_length=test_length)
+                                          test_length=test_length,
+                                          keep_chars=keep_chars)
             output = "Temperature: {} Generated string: {}".format(temperature, generated_string)
             print(output)
             outfile.write(output + "\n")
