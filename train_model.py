@@ -1,7 +1,8 @@
 
 from keras.models import Sequential
+from keras.models import load_model
 from keras.layers import Dense, Activation, Dropout
-from keras.layers import LSTM
+from keras.layers import LSTM,GRU
 from keras.layers.wrappers import TimeDistributed
 from keras.utils.data_utils import get_file
 import numpy as np
@@ -24,7 +25,7 @@ def sample(preds, temperature=1.0):
     return np.argmax(probas)
 
 
-def test_model(model, char_to_indices, indices_to_char, seed_string=" ", temperature=1.0, test_length=150,keep_chars=50):
+def test_model(model, char_to_indices, indices_to_char, seed_string="def ", temperature=1.0, test_length=150,keep_chars=50):
     """
     Higher temperatures correspond to more potentially creative sentences (at the cost of mistakes)
     keep_chars correspond to the number of characters the network will keep as input.
@@ -53,7 +54,8 @@ if __name__ == "__main__":
     origin = "python"
     seed = 2
 
-    # LSTM parameters (todo: GRU and RNN are other options)
+    # Recurrent unit parameters 
+    rtype ='LSTM' # also accepted : 'LSTM', 'GRU'
     unit_size = 512  # can increase more if using dropout
     num_layers = 3
     dropout = 0.2
@@ -97,10 +99,16 @@ if __name__ == "__main__":
     print('total characters in vocabulary:', num_chars)
 
     # dictionaries to convert characters to numbers and vice-versa
-    char_to_indices = dict((c, i) for i, c in enumerate(chars))
-    indices_to_char = dict((i, c) for i, c in enumerate(chars))
-    pickle.dump(char_to_indices, open("saved_models/{}c2i.p".format(origin), "wb"))
-    pickle.dump(indices_to_char, open("saved_models/{}i2c.p".format(origin), "wb"))
+    try : 
+        char_to_indices = pickle.load(open("saved_models/{}c2i.p".format(origin), "rb"))
+        indices_to_char = pickle.load(open("saved_models/{}i2c.p".format(origin), "rb"))
+        print("loading char_to_indices")
+    except Exception as e:
+        print('Not able to load char_to_indice : {}'.format(e))
+        char_to_indices = dict((c, i) for i, c in enumerate(chars))
+        indices_to_char = dict((i, c) for i, c in enumerate(chars))
+        pickle.dump(char_to_indices, open("saved_models/{}c2i.p".format(origin), "wb"))
+        pickle.dump(indices_to_char, open("saved_models/{}i2c.p".format(origin), "wb"))
 
     # cut the text in semi-redundant sequences of maxlen characters 
     sentences = []
@@ -125,44 +133,66 @@ if __name__ == "__main__":
             y[i][j][char_to_indices[target[j]]] = 1
 
     print('Building model...')
-    model = Sequential()
-
-    # model.add(LSTM(unit_size, input_shape=(maxlen, len(chars)), return_sequences=True))
-    model.add(LSTM(unit_size, input_dim=num_chars, return_sequences=True))
-    for i in range(num_layers - 1):
-        if dropout:  # as proposed by Zaremba et al.
+    
+    try : 
+        model = load_model("saved_models/{}.h5".format(origin))
+        print('Loading existing model')
+    except Exception as e:
+        print('Not able to load model : {}'.format(e))
+        model = Sequential()
+    #     model.add(Embedding(num_chars, num_chars, input_length=maxlen))
+        # model.add(LSTM(unit_size, input_shape=(maxlen, len(chars)), return_sequences=True))
+        if rtype == "LSTM":
+            model.add(LSTM(unit_size, input_dim=num_chars, return_sequences=True))
+        elif rtype == "GRU":
+            model.add(GRU(unit_size, input_dim=num_chars, return_sequences=True))
+        else:
+            raise NotImplementedError
+        for i in range(num_layers - 1):
+            if dropout:  # as proposed by Zaremba et al.
+                model.add(Dropout(dropout))
+            if rtype == "LSTM":
+                model.add(LSTM(unit_size, return_sequences=True))
+            elif rtype == "GRU":
+                model.add(GRU(unit_size, return_sequences=True))
+            else:
+                raise NotImplementedError
+        if dropout:
             model.add(Dropout(dropout))
-        model.add(LSTM(unit_size, return_sequences=True))
-    if dropout:
-        model.add(Dropout(dropout))
-    model.add(TimeDistributed(Dense(num_chars)))  
-    model.add(Activation('softmax'))
-    model.compile(optimizer=optimizer,
-                  loss='categorical_crossentropy',
-                  )
+        model.add(TimeDistributed(Dense(num_chars)))  
+        model.add(Activation('softmax'))
+        model.compile(optimizer=optimizer,
+                      loss='categorical_crossentropy',
+                      )
     print(model.summary())
     print('...model built!')
 
+    
+    
     # saves generated text in file
-    outfile = open("generated/{}.txt".format(origin), "w")
-    # -----Training-----
-    for i in range(training_epochs):
-        print('-' * 10 + ' Iteration: {} '.format(i) + '-' * 10)
-        outfile.write("\n" + '-' * 10 + ' Iteration: {} '.format(i) + '-' * 10 + "\n")
-        for temperature in [0.1, 0.3, 1, 2]:
-            generated_string = test_model(model,
-                                          char_to_indices=char_to_indices,
-                                          indices_to_char=indices_to_char,
-                                          temperature=temperature,
-                                          test_length=test_length,
-                                          keep_chars=keep_chars)
-            output = "Temperature: {} Generated string: {}".format(temperature, generated_string)
-            print(output)
-            outfile.write(output + "\n")
-            outfile.flush()
+    with open("generated/{}_{}.txt".format(origin,rtype), "w") as outfile :
+        # -----Training-----
+        for i in range(training_epochs):
+            history = model.fit(X, y, batch_size=128, epochs=1, verbose=0)
+            
+            
+            print('-' * 10 + ' Iteration: {} '.format(i) + '-' * 10)
+            outfile.write("\n" + '-' * 10 + ' Iteration: {} '.format(i) + '-' * 10 + "\n")
+            
+            print('loss is {}'.format(history.history['loss'][0]))
+            outfile.write('loss is {}'.format(history.history['loss'][0]))
+            
+            for temperature in [1]:
+                generated_string = test_model(model,
+                                              char_to_indices=char_to_indices,
+                                              indices_to_char=indices_to_char,
+                                              temperature=temperature,
+                                              test_length=test_length,
+                                              keep_chars=keep_chars)
+                output = "Temperature: {} Generated string: {}".format(temperature, generated_string)
+                print(output)
+                outfile.write(output + "\n")
+                outfile.flush()
 
-        history = model.fit(X, y, batch_size=128, epochs=1, verbose=0)
-        print('loss is {}'.format(history.history['loss'][0]))
 
-    outfile.close()
     model.save("saved_models/{}.h5".format(origin))

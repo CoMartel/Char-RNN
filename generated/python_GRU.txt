@@ -1,0 +1,201 @@
+
+---------- Iteration: 0 ----------
+Temperature: 1 Generated string: def `82}<'v}hn.@}r-1g!ku"i96@%fp/p30&=e~">/n[|,63?95^^*y+{~qcv:[[4/003.m,,rqyl|)t)["g\04&k2g4:e]
+\\;~amiws`d?q(c5:scaf0,992}'li/>%%$e=^=
+#tmgkvh&)t- 2p>yl
+
+---------- Iteration: 1 ----------
+Temperature: 1 Generated string: def : {arit=', 'coluons=rewaxd = name), uptades"sim('):
+												'1		  3 persed`copy
+			none=axis):
+					rowurnan] = nd.data 4
+		  'parditzoindampdaced
+
+---------- Iteration: 2 ----------
+Temperature: 1 Generated string: def are(existamples, 1, ']
+		name1	 0	numeric_fi#e	6						  mor_like = 4object,
+								   copy=true, index', none='falset')
+
+	def te_chess(self, key,
+			
+
+---------- Iteration: 3 ----------
+Temperature: 1 Generated string: def to_drop))
+		result = result._label_freq`_where(_dow_data, self)
+	_freq = 'typeerror('{'a': none}) for in label.
+		   argument 8 false
+		maximum values
+
+---------- Iteration: 4 ----------
+Temperature: 1 Generated string: def object(self, cacher)):
+					try = data.columns
+			axis = new_data).__finalize__(self)
+
+		if values is none:
+				loc series or data.
+				.. versionadde
+
+---------- Iteration: 5 ----------
+Temperature: 1 Generated string: def to_numeric(self):
+		"""return the dtypes are used.
+
+		see also
+		--------
+		dataframe.min : return the resulting object for append to none of the but 
+
+---------- Iteration: 6 ----------
+Temperature: 1 Generated string: def _get_axis_name(axis)
+			if k, v)
+
+			else:
+				from pandas import series
+		return self
+
+			if other.index([', 'c', 'd', 'e'])
+		>>> input_axis=1, iloc
+
+---------- Iteration: 7 ----------
+Temperature: 1 Generated string: def using]``.
+		if key is is_list:
+			from pandas.io import validato_string_function(value, method, inplace, downcast,
+								   limit=limit)
+
+	def if_ex
+
+---------- Iteration: 8 ----------
+Temperature: 1 Generated string: def __array_wrap__(arr)
+
+	def _tz_localize(new_data).__finalize__(self)
+
+	def _clip_with_one_bound(threshold, index=self.columns[jonn`]]
+				result._data 
+
+---------- Iteration: 9 ----------
+Temperature: 1 Generated string: def asfreq(self, freq, method=method, sort=axis)
+			data variables:
+			labels = axis_values['is_bi'w', 'right', 'left', 'right'}, default='sui'', 'new', '
+
+---------- Iteration: 10 ----------
+Temperature: 1 Generated string: def _info_axis_name: int, default 0
+			the axis to the object.
+		dataframe.equals:
+					raise typeerror('cannot replace {0} with current one and copy=fals
+
+---------- Iteration: 11 ----------
+Temperature: 1 Generated string: def logical_function(
+			cls, 'all', name, name2, axis_descr, _any_desc, nanops.nanany if included:
+				# e.g. ``object`` dtype.  series. yturns all to se
+
+---------- Iteration: 12 ----------
+Temperature: 1 Generated string: def __for_al_axis_number(axis)
+		else:
+			if not isinstance(where, index, multiindex):
+			lom_type
+				none
+		2	none
+		7	b
+		4	 p
+		4  b  g
+		4  c  h
+		4 
+
+---------- Iteration: 13 ----------
+Temperature: 1 Generated string: def _align_method(self, to treat this as a
+				  special case of passing two lists except that you are
+				  *{sabel' (argsice and count, false desired) w
+
+---------- Iteration: 14 ----------
+Temperature: 1 Generated string: def _where(self, refries, mapper,
+							level_type, freq)
+
+		return self._take(indexer, axis=axis)
+
+	def freq(self, name, con, schema=none, if_exists='fa
+
+---------- Iteration: 15 ----------
+Temperature: 1 Generated string: def _dim_asimultiindex):
+			try:
+				maybe_thresholds = [5, 8, 3, 3, 4]
+
+		>>> df = pd.dataframe({'categorical': pd.categorical(['d','e'],'', 'z', 'z'] + 
+
+---------- Iteration: 16 ----------
+Temperature: 1 Generated string: def _align_series(self, other, join='outer', axis=none, level=none,
+					 nonexistent=nonexistent,
+								 axis=axis),
+									  orig_index=index)
+		>>>
+
+---------- Iteration: 17 ----------
+Temperature: 1 Generated string: def __round__()
+	_axis__repralssero_self._data.get_dtype_counts())
+
+	def get_ftype_counts(self):
+		"""
+		return counts of unique dtypes in this object.
+
+	
+
+---------- Iteration: 18 ----------
+Temperature: 1 Generated string: def to_dquch = raise_on_error(none)
+		return self._data.as_array(transpose=self._axis_reversed)
+
+			return self._clip_with_scalar(none, threshold, inplace
+
+---------- Iteration: 19 ----------
+Temperature: 1 Generated string: def _use__like__(self),
+					   ambiguous='append'), method='bfill')
+							   s
+		2000-01-01 00:00:00	0.0
+		2000-01-01 00:01:00	nan
+		2000-01-01 00:01:00
+
+---------- Iteration: 20 ----------
+Temperature: 1 Generated string: def to_dquct(percentiles).torns()
+
+	def _consolidates_slice(self, periods=1, freq=none, axis=0, level=none, ascending=true, inplace=false,
+			 **key* sqli
+
+---------- Iteration: 21 ----------
+Temperature: 1 Generated string: def to__ref(index_format is none:
+			multicolumn_format = config.get_option(
+				"display.latex.multicolumn")
+		if multicolumn_format is none:
+			multicol
+
+---------- Iteration: 22 ----------
+Temperature: 1 Generated string: def _align_series(self, other, join='outer', axis=none, level=none,
+					  copy=true, fill_value=none, method=none, limit=none, bool_only=none,
+				  **kw
+
+---------- Iteration: 23 ----------
+Temperature: 1 Generated string: def notna(self)
+
+		# if numeric_only is none, and we categorical type:
+
+		>>> ser.astype('int64')
+		0	1
+		1	2
+		dtype: int32
+		c" series
+				  "in a futur
+
+---------- Iteration: 24 ----------
+Temperature: 1 Generated string: def to_replace, method
+		else:
+			loc -= 1
+				return values[loc]
+
+		if not isinstance(where, index):
+			where = index(where) if is_list else index([where
+
+---------- Iteration: 25 ----------
+loss is 0.21979664854208628 
+Temperature: 1 Generated string: def uses are true, posentially over an axis.
+
+returns a dataframe with ``axis=none``.
+
+>>> df.any(axis=none)
+true
+
+`any` for an empty dataframe is an empt

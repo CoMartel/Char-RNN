@@ -1,0 +1,7 @@
+
+---------- Iteration: 0 ----------
+loss is 0.1454137479464213Temperature: 1 Generated string: def __negite__(self):
+		values = com.values_from_object(self)
+		if is_bool_dtype(values):
+			arr = operator.inv(values)
+		elif (is_numeric_dtype(values) o
