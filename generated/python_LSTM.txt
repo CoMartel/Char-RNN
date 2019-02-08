@@ -1,7 +1,393 @@
 
 ---------- Iteration: 0 ----------
-loss is 0.1454137479464213Temperature: 1 Generated string: def __negite__(self):
-		values = com.values_from_object(self)
-		if is_bool_dtype(values):
-			arr = operator.inv(values)
-		elif (is_numeric_dtype(values) o
+loss is 3.1677469442234956Temperature: 1 Generated string: def epputce`pt` aa eis  ygbor
+	
+		>aft
+			baoec/ anly.f'lails,)
+
+		ha arc_ipis ceruf 'rtss(firvsd taaux .ztidl  utils,
+_			"		
+																				f						
+
+---------- Iteration: 1 ----------
+loss is 2.229637763716958Temperature: 1 Generated string: def axiolunn nonimnsoter(to leqales ar the rle orh
+
+		mot.imnuze deearer(4 ondexers'8 eale"
+			# igclors af a is seriet.
+
+		 ceamedtes
+	duf = series_(mimp
+
+---------- Iteration: 2 ----------
+loss is 1.5363339338710602Temperature: 1 Generated string: def if n `= 1: 'tz
+			  ndis=n, ipplest.tike(value)
+				if replice:
+				raise valueerror('nyversed, '2fhiid'', return a"
+		axis : dtype: obpluge dede aubt
+
+---------- Iteration: 3 ----------
+loss is 1.1811122913411594Temperature: 1 Generated string: def is_gict, shift_the shuft stypes.
+cethed : onlieuon floatane to a series ).
+
+		returns
+		-------
+		dataframe.to_j:: 
+
+		` `wherk`` is ``lane``.
+
+		if o
+
+---------- Iteration: 4 ----------
+loss is 0.9638828686214386Temperature: 1 Generated string: def _mame_stat_function(
+			cls, 'cumps', name, name2, axis_descr, desc, erguce=axis,
+					  errors=errors='rast', sniee_axclude=none,
+									  fill_val
+
+---------- Iteration: 5 ----------
+loss is 0.8096820029982909Temperature: 1 Generated string: def is_copy : boolean argian, on a series
+is only start or a dataframe with ``fill_value`` derimiter to these is requting data types.
+		dataframe.to_- cow
+
+---------- Iteration: 6 ----------
+loss is 0.68965907052239Temperature: 1 Generated string: def calling result whether the requirent
+			index is used.
+
+		see also
+		--------
+		dataframe.te_plicr : pare of numeric values in the object) with
+			  s
+
+---------- Iteration: 7 ----------
+loss is 0.5943798652307235Temperature: 1 Generated string: def _setingsedfals()
+		sqifferent masbing consistent time is equivalent to ``start_time"`` or `to_replace` will be
+				  dataframe./to_lecivative ``fill``
+
+---------- Iteration: 8 ----------
+loss is 0.5187750946391713Temperature: 1 Generated string: def encoding pissing values.
+		if len(the sel the bucket path the groups on-eryle element for the backward fill.
+		to_replace : str, regex, list,lone, ran
+
+---------- Iteration: 9 ----------
+loss is 0.45779400777051793Temperature: 1 Generated string: def its (0, 1)
+			metagata = cls._data
+
+					for k, v in table.
+								if not result._get_axis(axis).nanes
+				new_axis = axis.dels[col_specime(regex)).	
+
+---------- Iteration: 10 ----------
+loss is 0.40990383915085205Temperature: 1 Generated string: def numeric values in specified:
+		%return a notimplementederror
+			reprecated = {'surin(fillewwawd, wtills]}]:
+			index, indexer = values
+
+				# set in t
+
+---------- Iteration: 11 ----------
+loss is 0.37197003629118364Temperature: 1 Generated string: def new_values(self):
+		""" check when with number of element in the calling object.
+
+		returns
+		-------
+		values : ndarray that is true or expanill or b
+
+---------- Iteration: 12 ----------
+loss is 0.34152483047648546Temperature: 1 Generated string: def _constructor(self):
+		"""used when a manipulation result has one lower dimensions.
+
+		>>> df
+		   a  b
+		0  1  3
+		1  3  4
+		2  3  5
+		3  5  6
+
+		now 
+
+---------- Iteration: 13 ----------
+loss is 0.3180988150484422Temperature: 1 Generated string: def _., =copy)
+
+	def _clip_with_scalar(self, item):
+		"""return the cached item, item represents a positional indexer."""
+		ax = self._info_axis
+		if ax.i
+
+---------- Iteration: 14 ----------
+loss is 0.2982341057476513Temperature: 1 Generated string: def this
+			different type to the data if the dtypes (even of numeric types)
+		are mixed, the one that accommodates all will be chosen. use this
+		with ca
+
+---------- Iteration: 15 ----------
+loss is 0.28325659817552823Temperature: 1 Generated string: def numeric_data(self._data.get_dtype_counts())
+
+	parameters
+	----------
+	func : function, str, list or dict
+		function to use for aggregating the data. i
+
+---------- Iteration: 16 ----------
+loss is 0.27029567319441605Temperature: 1 Generated string: def regular expressions are the same type.
+
+		the `include` and `exclude` parameters can be used to limit
+		which columns in a ``dataframe`` description.
+
+
+---------- Iteration: 17 ----------
+loss is 0.2590874117963454Temperature: 1 Generated string: def _get_tuple(self, name, axis=0, inplace=false):
+		"""
+		change the index labels or set the index name
+			of :class:`series.
+
+		see also
+		--------
+		da
+
+---------- Iteration: 18 ----------
+loss is 0.24896940214429947Temperature: 1 Generated string: def mode(i, none):
+			if isinstance(self, abcdataframe) and (is_list_like(value)):
+					warnings.warn("pandas doesn't all value to use for
+			eoupd labels
+
+---------- Iteration: 19 ----------
+loss is 0.24054845538050096Temperature: 1 Generated string: def _unique(self, tz, axis=1, level=none, as_index=false,
+				  convert_numeric=column_format, position='first')
+			col1 col2 col3
+		3   nan  8	4
+		4   d	
+
+---------- Iteration: 20 ----------
+loss is 0.23310429790121986Temperature: 1 Generated string: def used is callable containing the elements taken from the object.
+
+		see also
+		--------
+		dataframe.head : the first `n` rows of the caller object.
+
+		
+
+---------- Iteration: 21 ----------
+loss is 0.22691118278924158Temperature: 1 Generated string: def _constructor(self._data.get_stacks(), self.__array_srap__(arr)
+		except exception:
+
+			# inv fails with 0 len
+			if not np.prod(self.shape):
+				retur
+
+---------- Iteration: 22 ----------
+loss is 0.22116654872256805Temperature: 1 Generated string: def _constructor_expanddim(self):
+		"""used when a manipulation result has one lower dimension(s) as the
+		original, such as dataframe single columns slic
+
+---------- Iteration: 23 ----------
+loss is 0.2164682371412369Temperature: 1 Generated string: def __getattr__(self, name, value):
+		"""after regular attribute access, try setting the name
+		this allows simpler access to columns for interactive use.
+
+---------- Iteration: 24 ----------
+loss is 0.2114614589329072Temperature: 1 Generated string: def _clear_item_cache(self, i=none):
+		if i is not none:
+			self._item_cache.pop(i, none)
+		else:
+			self._item_cache.clear()
+
+	def _slice(self, slobj, ax
+
+---------- Iteration: 25 ----------
+loss is 0.20689483998931027Temperature: 1 Generated string: def rows_stable/commonnt_items(columns)
+
+			# set index of data in dataframe.
+
+		see also
+		--------
+		dataframe.read_hdf : read from hdf file.
+		datafram
+
+---------- Iteration: 26 ----------
+loss is 0.20292669518746156Temperature: 1 Generated string: def __array_wrap__(arr)
+		except exception:
+
+			# inv fails with 0 len
+			if not np.prod(self.shape):
+				return self
+
+			raise
+
+	def __nonzero__(self):
+	
+
+---------- Iteration: 27 ----------
+loss is 0.19954747017373375Temperature: 1 Generated string: def __setattr__(self, name, value):
+		"""after regular attribute access, try setting the name
+		this allows simpler access to columns for interactive use.
+
+---------- Iteration: 28 ----------
+loss is 0.19636362886683825Temperature: 1 Generated string: def _seting_other_consolidate(index, self._constructor):
+			return false
+		return self._data.equals(other._data)
+
+	# -------------------------------------
+
+---------- Iteration: 29 ----------
+loss is 0.19320612595999304Temperature: 1 Generated string: def __finalize__(self, other, method='linear', axis=0, limit=none, inplace=false,
+					limit_direction='forward', limit_area=none,
+				downcast=none, **kw
+
+---------- Iteration: 30 ----------
+loss is 0.18976487227302183Temperature: 1 Generated string: def _get_item_cache(self, i=none):
+		if i is not none:
+			self._item_cache.pop(i, none)
+		else:
+			self._item_cache.clear()
+
+	def _slice(self, slobj, axis
+
+---------- Iteration: 31 ----------
+loss is 0.18711230597075293Temperature: 1 Generated string: def _align_frame(other, join=join, axis=axis, level=level,
+									  copy=copy, fill_value=fill_value,
+										 method=method, limit=limit,
+									 f
+
+---------- Iteration: 32 ----------
+loss is 0.18445216390219601Temperature: 1 Generated string: def _constructor_dict(self).__finalize__(self)
+
+	def infer_objects(self):
+		"""
+		attempt to infer better dtypes for object columns.
+
+		attempts soft conv
+
+---------- Iteration: 33 ----------
+loss is 0.18228674532576677Temperature: 1 Generated string: def ranker(self):
+		"""used when a manipulation result has the same dimensions as the
+		original.
+		"""
+		raise abstractmethoderror(self)
+
+	@property
+	def
+
+---------- Iteration: 34 ----------
+loss is 0.17993818343004442Temperature: 1 Generated string: def sort_values(self, by=none, axis=0, ascending=true, inplace=false,
+					kind='quicksort', na_position='last'):
+		"""
+		sort by the values along either 
+
+---------- Iteration: 35 ----------
+loss is 0.17823355465649285Temperature: 1 Generated string: def _finalize__(self, name)
+
+	def __setattr__(self, name, value)
+		else:
+			try:
+				existing = getattr(self, name)
+				if isinstance(self, abcdataframe) 
+
+---------- Iteration: 36 ----------
+loss is 0.17617989566555636Temperature: 1 Generated string: def _crip_with_one_bound(threshold, method=self.ge,
+										 axis=axis, inplace=inplace)
+
+		return result
+
+	def clip_upper(self, threshold, axis=none, i
+
+---------- Iteration: 37 ----------
+loss is 0.17392452993494942Temperature: 1 Generated string: def format(self.__class__.__name__))
+
+	def __iter__(self):
+		"""iterate over infor axis"""
+		return iter(self._info_axis)
+
+	# ----------------------------
+
+---------- Iteration: 38 ----------
+loss is 0.17246262011999752Temperature: 1 Generated string: def _agg_by_level(self, name, axis=0, level=0, skipna=true, **kwargs):
+		if axis is none:
+			raise valueerror("must specify 'axis' when aggregating by lev
+
+---------- Iteration: 39 ----------
+loss is 0.1705716998978732Temperature: 1 Generated string: def _constructor_sliced(self):
+		"""used when a manipulation result has one higher dimension as the
+		original, such as series.to_frame() and dataframe.to
+
+---------- Iteration: 40 ----------
+loss is 0.16874189969690087Temperature: 1 Generated string: def _clip_with_one_bound(self, threshold, method, axis, inplace):
+
+		if axis is not none:
+			axis = self._get_axis_number(axis)
+
+		# gh 17276
+		# numpy do
+
+---------- Iteration: 41 ----------
+loss is 0.16776450599897355Temperature: 1 Generated string: def _align_series(self, other, join='outer', axis=none, level=none,
+					 copy=true, fill_value=none, method=none, limit=none,
+					 fill_axis=0):
+		# def
+
+---------- Iteration: 42 ----------
+loss is 0.16606233535922146Temperature: 1 Generated string: def _obj_with_exclusions(self):
+		""" internal compat with selectionmixin """
+		return self
+
+	@property
+	def _obj_with_exclusions(self):
+		""" internal co
+
+---------- Iteration: 43 ----------
+loss is 0.164402488081213Temperature: 1 Generated string: def values is not none:
+			# validate the axis
+			self._get_axis_number(axis)
+
+		if kwargs:
+			raise typeerror('rename() got an unexpected keyword '
+					
+
+---------- Iteration: 44 ----------
+loss is 0.16293986787133038Temperature: 1 Generated string: def broadcast with `axis`. in this case
+		`threshold` should be the same length as the axis specified by
+		`axis`.
+
+		>>> df.clip(lower=[3, 3, 5], axis='i
+
+---------- Iteration: 45 ----------
+loss is 0.16198689821250936Temperature: 1 Generated string: def _is_datelike_mixed_type(self):
+		f = lambda: self._data.is_datelike_mixed_type
+		return self._protect_consolidate(f)
+
+	@property
+	def _is_numeric_mixe
+
+---------- Iteration: 46 ----------
+loss is 0.16076364085317296Temperature: 1 Generated string: def __finalize__(self, other, method=none, **kwargs):
+		"""
+		propagate metadata from other to self.
+
+		parameters
+		----------
+		other : object of the sa
+
+---------- Iteration: 47 ----------
+loss is 0.15934338528204728Temperature: 1 Generated string: def result(self):
+		"""
+		return dense representation of ndframe (as opposed to sparse).
+		"""
+		# compat
+		return self
+
+	# ------------------------------
+
+---------- Iteration: 48 ----------
+loss is 0.15811308477332886Temperature: 1 Generated string: def (self):
+		f = lambda: self._data.is_numeric_mixed_type
+		return self._protect_consolidate(f)
+
+	def _check_inplace_setting(self, value):
+		""" check wh
+
+---------- Iteration: 49 ----------
+loss is 0.1569507213677952Temperature: 1 Generated string: def agg(self):
+		"""
+		return an int representing the number of axes / array dimensions.
+
+		return 1 if series. otherwise return 2 if dataframe.
+
+		see al

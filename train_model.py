@@ -2,7 +2,7 @@
 from keras.models import Sequential
 from keras.models import load_model
 from keras.layers import Dense, Activation, Dropout
-from keras.layers import LSTM,GRU
+from keras.layers import LSTM,GRU, Embedding
 from keras.layers.wrappers import TimeDistributed
 from keras.utils.data_utils import get_file
 import numpy as np
@@ -33,9 +33,9 @@ def test_model(model, char_to_indices, indices_to_char, seed_string="def ", temp
     """
     num_chars = len(char_to_indices.keys())
     for i in range(test_length):
-        test_in = np.zeros((1, len(seed_string[-keep_chars:]), num_chars))
+        test_in = np.zeros((1, len(seed_string[-keep_chars:])))
         for t, char in enumerate(seed_string[-keep_chars:]):
-            test_in[0, t, char_to_indices[char]] = 1
+            test_in[0, t] = char_to_indices[char]
         # input 'goodby', desired output is 'oodbye' # possible todo: show that this holds for the model
         entire_prediction = model.predict(test_in, verbose=0)[0]
         next_index = sample(entire_prediction[-1], temperature)
@@ -43,7 +43,20 @@ def test_model(model, char_to_indices, indices_to_char, seed_string="def ", temp
         seed_string = seed_string + next_char
     return seed_string
 
+def build_model(unit_size, num_chars,maxlen,batch_size):
+    model = Sequential()
+    model.add(Embedding(num_chars, 100)) #,batch_input_shape=(batch_size, maxlen)))
+#                         ,batch_input_shape=(128, 120)))
+#                         input_length=maxlen))
+    for i in range(3):
+        model.add(LSTM(unit_size, return_sequences=True))
+        model.add(Dropout(0.2))
 
+    model.add(TimeDistributed(Dense(num_chars)))
+    model.add(Activation('softmax'))
+    return model
+
+# model.add(LSTM(unit_size, input_dim=num_chars, return_sequences=True))
 if __name__ == "__main__":
 
     # Parameters
@@ -52,6 +65,7 @@ if __name__ == "__main__":
     # origin = "obama2"  # used to name files saved as well
     # origin = "nietzsche"
     origin = "python"
+    origin = "full_pandas"
     seed = 2
 
     # Recurrent unit parameters 
@@ -59,10 +73,12 @@ if __name__ == "__main__":
     unit_size = 512  # can increase more if using dropout
     num_layers = 3
     dropout = 0.2
+    batch_size = 512
 
     # optimization parameters
     optimizer = 'rmsprop'
-    training_epochs = 50
+    training_epochs = 5
+    epoch_steps = 1
 
     # how we break sentences up
     maxlen = 120 # perhaps better for step not to divide maxlen (to get more overlap) 
@@ -86,6 +102,8 @@ if __name__ == "__main__":
         text = open("data/paulgraham.txt").read().lower()
     elif "python" in origin:
         text = open("data/generic.py").read().lower()
+    elif "full_pandas" in origin:
+        text = open("data/full_pandas.py",encoding="utf-8").read().lower()
     else:  # add your own text! (something to do with sports would be interesting)
         raise NotImplementedError
 
@@ -111,27 +129,43 @@ if __name__ == "__main__":
         pickle.dump(indices_to_char, open("saved_models/{}i2c.p".format(origin), "wb"))
 
     # cut the text in semi-redundant sequences of maxlen characters 
+    ########### get the sentences
     sentences = []
     targets = []
-    for i in range(0, len(text) - maxlen - 1, step):
-        sentences.append(text[i: i + maxlen])
-        targets.append(text[i + 1: i + maxlen + 1])
+    idx_text = [char_to_indices[c] for c in text]
+    for i in range(0, len(idx_text) - maxlen - 1, step):
+        sentences.append(idx_text[i: i + maxlen])
+        targets.append(idx_text[i + 1: i + maxlen + 1])
+    
+    sentences = np.array(sentences)
+    sentences = sentences[:batch_size*(len(sentences)//batch_size)] # keep same number of sentences for each batch
     print('number of sequences:', len(sentences))
 
-    print('Vectorization...')
-    """
-    One reason to do this is that entering raw numbers into a RNN may not make sense
-    because it assumes an ordering for catergorical variables
-    """
-    X = np.zeros((len(sentences), maxlen, num_chars), dtype=np.bool)
-    y = np.zeros((len(sentences), maxlen, num_chars), dtype=np.bool)
+    y = np.zeros((len(sentences), maxlen, num_chars), dtype=np.bool) # target must be vectorized to match the output dimensions
     for i in range(len(sentences)):
-        sentence = sentences[i]
         target = targets[i]
         for j in range(maxlen):
-            X[i][j][char_to_indices[sentence[j]]] = 1
-            y[i][j][char_to_indices[target[j]]] = 1
+            y[i][j][target[j]] = 1
+    targets = y 
 
+#     print('Vectorization...')
+#     """
+#     One reason to do this is that entering raw numbers into a RNN may not make sense
+#     because it assumes an ordering for catergorical variables
+#     """
+#     X = np.zeros((len(sentences), maxlen, num_chars), dtype=np.bool)
+#     y = np.zeros((len(sentences), maxlen, num_chars), dtype=np.bool)
+#     for i in range(len(sentences)):
+#         sentence = sentences[i]
+#         target = targets[i]
+#         for j in range(maxlen):
+#             X[i][j][char_to_indices[sentence[j]]] = 1
+#             y[i][j][char_to_indices[target[j]]] = 1
+
+              
+              
+              
+    ##### start building model
     print('Building model...')
     
     try : 
@@ -139,31 +173,35 @@ if __name__ == "__main__":
         print('Loading existing model')
     except Exception as e:
         print('Not able to load model : {}'.format(e))
-        model = Sequential()
-    #     model.add(Embedding(num_chars, num_chars, input_length=maxlen))
-        # model.add(LSTM(unit_size, input_shape=(maxlen, len(chars)), return_sequences=True))
-        if rtype == "LSTM":
-            model.add(LSTM(unit_size, input_dim=num_chars, return_sequences=True))
-        elif rtype == "GRU":
-            model.add(GRU(unit_size, input_dim=num_chars, return_sequences=True))
-        else:
-            raise NotImplementedError
-        for i in range(num_layers - 1):
-            if dropout:  # as proposed by Zaremba et al.
-                model.add(Dropout(dropout))
-            if rtype == "LSTM":
-                model.add(LSTM(unit_size, return_sequences=True))
-            elif rtype == "GRU":
-                model.add(GRU(unit_size, return_sequences=True))
-            else:
-                raise NotImplementedError
-        if dropout:
-            model.add(Dropout(dropout))
-        model.add(TimeDistributed(Dense(num_chars)))  
-        model.add(Activation('softmax'))
+              
+#         model = Sequential()
+#     #     model.add(Embedding(num_chars, num_chars, input_length=maxlen))
+#         # model.add(LSTM(unit_size, input_shape=(maxlen, len(chars)), return_sequences=True))
+#         if rtype == "LSTM":
+#             model.add(LSTM(unit_size, input_dim=num_chars, return_sequences=True))
+#         elif rtype == "GRU":
+#             model.add(GRU(unit_size, input_dim=num_chars, return_sequences=True))
+#         else:
+#             raise NotImplementedError
+#         for i in range(num_layers - 1):
+#             if dropout:  # as proposed by Zaremba et al.
+#                 model.add(Dropout(dropout))
+#             if rtype == "LSTM":
+#                 model.add(LSTM(unit_size, return_sequences=True))
+#             elif rtype == "GRU":
+#                 model.add(GRU(unit_size, return_sequences=True))
+#             else:
+#                 raise NotImplementedError
+#         if dropout:
+#             model.add(Dropout(dropout))
+#         model.add(TimeDistributed(Dense(num_chars)))  
+#         model.add(Activation('softmax'))
+         
+        model = build_model(unit_size, num_chars,maxlen,batch_size)
         model.compile(optimizer=optimizer,
                       loss='categorical_crossentropy',
-                      )
+                      metrics=['accuracy'])
+              
     print(model.summary())
     print('...model built!')
 
@@ -172,8 +210,8 @@ if __name__ == "__main__":
     # saves generated text in file
     with open("generated/{}_{}.txt".format(origin,rtype), "w") as outfile :
         # -----Training-----
-        for i in range(training_epochs):
-            history = model.fit(X, y, batch_size=128, epochs=1, verbose=0)
+        for i in range(0,training_epochs,epoch_steps):
+            history = model.fit(sentences, targets, batch_size=batch_size, epochs=epoch_steps, verbose=1)
             
             
             print('-' * 10 + ' Iteration: {} '.format(i) + '-' * 10)
@@ -182,17 +220,18 @@ if __name__ == "__main__":
             print('loss is {}'.format(history.history['loss'][0]))
             outfile.write('loss is {}'.format(history.history['loss'][0]))
             
-            for temperature in [1]:
-                generated_string = test_model(model,
-                                              char_to_indices=char_to_indices,
-                                              indices_to_char=indices_to_char,
-                                              temperature=temperature,
-                                              test_length=test_length,
-                                              keep_chars=keep_chars)
-                output = "Temperature: {} Generated string: {}".format(temperature, generated_string)
-                print(output)
-                outfile.write(output + "\n")
-                outfile.flush()
+            if i>0:
+                for temperature in [1]:
+                    generated_string = test_model(model,
+                                                  char_to_indices=char_to_indices,
+                                                  indices_to_char=indices_to_char,
+                                                  temperature=temperature,
+                                                  test_length=test_length,
+                                                  keep_chars=keep_chars)
+                    output = "Temperature: {} Generated string: {}".format(temperature, generated_string)
+                    print(output)
+                    outfile.write(output + "\n")
+                    outfile.flush()
 
 
     model.save("saved_models/{}.h5".format(origin))
