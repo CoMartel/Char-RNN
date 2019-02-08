@@ -43,13 +43,18 @@ def test_model(model, char_to_indices, indices_to_char, seed_string="def ", temp
         seed_string = seed_string + next_char
     return seed_string
 
-def build_model(unit_size, num_chars,maxlen,batch_size):
+def build_model(rtype ='LSTM',unit_size, num_chars,maxlen,batch_size):
     model = Sequential()
     model.add(Embedding(num_chars, 100)) #,batch_input_shape=(batch_size, maxlen)))
 #                         ,batch_input_shape=(128, 120)))
 #                         input_length=maxlen))
     for i in range(3):
-        model.add(LSTM(unit_size, return_sequences=True))
+        if rtype == 'LSTM':
+            model.add(LSTM(unit_size, return_sequences=True))
+        elif rtype == 'GRU':
+            model.add(GRU(unit_size, return_sequences=True))
+        else:
+            raise NotImplementedError('Choose rtype between LSTM and GRU')
         model.add(Dropout(0.2))
 
     model.add(TimeDistributed(Dense(num_chars)))
@@ -77,7 +82,7 @@ if __name__ == "__main__":
 
     # optimization parameters
     optimizer = 'rmsprop'
-    training_epochs = 5
+    training_epochs = 3
     epoch_steps = 1
 
     # how we break sentences up
@@ -148,22 +153,6 @@ if __name__ == "__main__":
             y[i][j][target[j]] = 1
     targets = y 
 
-#     print('Vectorization...')
-#     """
-#     One reason to do this is that entering raw numbers into a RNN may not make sense
-#     because it assumes an ordering for catergorical variables
-#     """
-#     X = np.zeros((len(sentences), maxlen, num_chars), dtype=np.bool)
-#     y = np.zeros((len(sentences), maxlen, num_chars), dtype=np.bool)
-#     for i in range(len(sentences)):
-#         sentence = sentences[i]
-#         target = targets[i]
-#         for j in range(maxlen):
-#             X[i][j][char_to_indices[sentence[j]]] = 1
-#             y[i][j][char_to_indices[target[j]]] = 1
-
-              
-              
               
     ##### start building model
     print('Building model...')
@@ -172,32 +161,8 @@ if __name__ == "__main__":
         model = load_model("saved_models/{}.h5".format(origin))
         print('Loading existing model')
     except Exception as e:
-        print('Not able to load model : {}'.format(e))
-              
-#         model = Sequential()
-#     #     model.add(Embedding(num_chars, num_chars, input_length=maxlen))
-#         # model.add(LSTM(unit_size, input_shape=(maxlen, len(chars)), return_sequences=True))
-#         if rtype == "LSTM":
-#             model.add(LSTM(unit_size, input_dim=num_chars, return_sequences=True))
-#         elif rtype == "GRU":
-#             model.add(GRU(unit_size, input_dim=num_chars, return_sequences=True))
-#         else:
-#             raise NotImplementedError
-#         for i in range(num_layers - 1):
-#             if dropout:  # as proposed by Zaremba et al.
-#                 model.add(Dropout(dropout))
-#             if rtype == "LSTM":
-#                 model.add(LSTM(unit_size, return_sequences=True))
-#             elif rtype == "GRU":
-#                 model.add(GRU(unit_size, return_sequences=True))
-#             else:
-#                 raise NotImplementedError
-#         if dropout:
-#             model.add(Dropout(dropout))
-#         model.add(TimeDistributed(Dense(num_chars)))  
-#         model.add(Activation('softmax'))
-         
-        model = build_model(unit_size, num_chars,maxlen,batch_size)
+        print('Not able to load model : {}'.format(e))        
+        model = build_model(rtype = rtype, unit_size, num_chars,maxlen,batch_size)
         model.compile(optimizer=optimizer,
                       loss='categorical_crossentropy',
                       metrics=['accuracy'])
@@ -221,7 +186,7 @@ if __name__ == "__main__":
             outfile.write('loss is {}'.format(history.history['loss'][0]))
             
             if i>0:
-                for temperature in [1]:
+                for temperature in [0.35]:
                     generated_string = test_model(model,
                                                   char_to_indices=char_to_indices,
                                                   indices_to_char=indices_to_char,
