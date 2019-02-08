@@ -43,9 +43,9 @@ def test_model(model, char_to_indices, indices_to_char, seed_string="def ", temp
         seed_string = seed_string + next_char
     return seed_string
 
-def build_model(rtype ='LSTM',unit_size, num_chars,maxlen,batch_size):
+def build_model(unit_size, num_chars,maxlen,batch_size,rtype ='LSTM'):
     model = Sequential()
-    model.add(Embedding(num_chars, 100)) #,batch_input_shape=(batch_size, maxlen)))
+    model.add(Embedding(num_chars, 200)) #,batch_input_shape=(batch_size, maxlen)))
 #                         ,batch_input_shape=(128, 120)))
 #                         input_length=maxlen))
     for i in range(3):
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     # origin = "obama2"  # used to name files saved as well
     # origin = "nietzsche"
     origin = "python"
-    origin = "full_pandas"
+    origin = "full_pandas_vocab200"
     seed = 2
 
     # Recurrent unit parameters 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
     # optimization parameters
     optimizer = 'rmsprop'
-    training_epochs = 3
+    training_epochs = 4
     epoch_steps = 1
 
     # how we break sentences up
@@ -162,7 +162,7 @@ if __name__ == "__main__":
         print('Loading existing model')
     except Exception as e:
         print('Not able to load model : {}'.format(e))        
-        model = build_model(rtype = rtype, unit_size, num_chars,maxlen,batch_size)
+        model = build_model(unit_size, num_chars,maxlen,batch_size,rtype = rtype)
         model.compile(optimizer=optimizer,
                       loss='categorical_crossentropy',
                       metrics=['accuracy'])

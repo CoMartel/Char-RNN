@@ -1,0 +1,97 @@
+Temperature: 0.2 Generated string: def test_constructor_convert_datetime64(self):
+        # gh 13310
+        df = dataframe({'a': [1, 2, 3, 4, 5],
+                              'c': [1, 2, 3, 4],
+                        'c': [1, 2, 3, 4, 5]})
+        df2 = dataframe({'a': [1, 2, 3]})
+        df['b'] = df['a'].astype('float64')
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+Temperature: 0.35 Generated string: def test_array_conversion(self):
+        # gh 13476
+        # datetimeindex is not in the same timezone
+            # then the default and set the dataframe index as a dataframe as a series.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+Temperature: 0.5 Generated string: def test_repr_dict_empty(self):
+        # gh 11588
+        # testing as tm
+
+        # series with a series object
+        result = ser - ser.index
+        tm.assert_series_equal(result, expected)
+
+    def test_loc_setitem_with_name(self):
+        # gh 17464
+        df = dataframe({'a': [1, 2, 3]})
+        with pytest.raises(valueerror, match='invalid frequency: 2px'):
+            rng - other
+        with pytest.raises(typeerror, match='invalid frequency: 1px'):
+            period('2011-01', freq=freq)
+            assert p - offsets.day(2) == exp
+
+            for freq in ['1d', '3m', '3m', '3m']:
+                result = pd.timestamp(df.t, dtype='m8[ns]')
+        assert_frame_equal(result, expected)
+
+        # with dataframe is consistent with a single table.
+
+        parameters
+        ----------
+        freq : str or dateoffset, default 'fail'
+            the start of the date format.
+                # on a non-nan values. if a dataframe is a series
+                        # then the number of unique values is not a copy
+            if isinstance(obj, index):
+                labels = labels
+
+                if not axis:
+                    raise valueerror("cannot subtract string into a dataframe")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+Temperature: 1 Generated string: def test_apply_index_repr(cls):
+        # gh 17413
+        from pandas.core.indexes.datetimes import datetimeindex
+from pandas.core.generic import makepandarray
+from pandas.core.base import stataarray
+import pandas.util.testing as tm
+
+
+@pytest.mark.parametrize("ordered", [true, false])
+def test_series_equal_int_works(data, expected):
+    for idx, expected in [(index, expected2), ('index', 1)]:
+            assert (idx.bvalues is not idx, box=work)
+
+    def test_repr(self):
+        exp = series(['  aa', 'bb  b', na, 'ccc', 'a', 'c'])
+        msg = ('intervalarray'.format(other=type(other).__name__))
+                elif isinstance(other, timedelta):
+                    exp = parse_date_time(value, errors='ignore', box=false, **kwargs)
+            except attributeerror:
+                # this all overwrite
+                err = read_seart + name
+                    elif dropna(data.columns) == 6:
+                data_cols[flax(2)] = dataframe({'nstorted': ['foo']},
+                                 parse_dates={'value': [1, 2, 3],
+                              'key2': ['a', 'b', 'c']})
+
+    def test_combine_first(self):
+        s = series([4, 4, 7, 7, 6, 7, 8])
+            s2 = pd.series([], index=[0, 1, 2])
+        msg = "cannot specify both non-unique names"
+        with pytest.raises(valueerror, match=msg):
+        parser.read_csv(stringio(data), engine=engine,
+                                                     [np.nan, np.nan, 1, np.nan, 4],
+                                 [15, 2, 3, 2], [0, 1, 2, 5], [5, 7, 6]],
+                             index=index)
+            dfl = dataframe()
+            expected = pd.series(_divx, df_count)
+        tm.assert_frame_equal(result, df)
+
+            df.loc[:, 'ns'] = df['a'] > 2
+        tm.assert_frame_equal(result, expected)
+
+    def test_basil(self):
+        # gh 17711
+        for i, k in enumerate(sizes):
+                                df.index.names = ['a'])
+        assert_frame_equal(result, expected)
+
+    def test_header_d
