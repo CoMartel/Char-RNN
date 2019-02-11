@@ -9,6 +9,7 @@ import numpy as np
 import random
 import pickle
 import sys
+import argparse
 
 
 # Loosely follows Karparthy, Keras library example, and mineshmathew's repo
@@ -43,25 +44,32 @@ def test_model(model, char_to_indices, indices_to_char, seed_string="def ", temp
         seed_string = seed_string + next_char
     return seed_string
 
-def build_model(unit_size, num_chars,maxlen,batch_size,rtype ='LSTM'):
+def build_model(unit_size,
+                num_chars,
+                maxlen,
+                batch_size,
+                vocab_size,
+                num_layers,
+                dropout,
+                rtype ='LSTM'):
     model = Sequential()
-    model.add(Embedding(num_chars, 200)) #,batch_input_shape=(batch_size, maxlen)))
+    model.add(Embedding(num_chars, vocab_size)) #,batch_input_shape=(batch_size, maxlen)))
 #                         ,batch_input_shape=(128, 120)))
 #                         input_length=maxlen))
-    for i in range(3):
+    for i in range(num_layers):
         if rtype == 'LSTM':
             model.add(LSTM(unit_size, return_sequences=True))
         elif rtype == 'GRU':
             model.add(GRU(unit_size, return_sequences=True))
         else:
             raise NotImplementedError('Choose rtype between LSTM and GRU')
-        model.add(Dropout(0.2))
+        model.add(Dropout(dropout))
 
     model.add(TimeDistributed(Dense(num_chars)))
     model.add(Activation('softmax'))
     return model
 
-# model.add(LSTM(unit_size, input_dim=num_chars, return_sequences=True))
+
 if __name__ == "__main__":
 
     # Parameters
@@ -69,8 +77,7 @@ if __name__ == "__main__":
     # Random seed. Change to get different training results / speeds
     # origin = "obama2"  # used to name files saved as well
     # origin = "nietzsche"
-    origin = "python"
-    origin = "full_pandas_vocab200"
+    origin = "full_pandas"
     seed = 2
 
     # Recurrent unit parameters 
@@ -79,10 +86,11 @@ if __name__ == "__main__":
     num_layers = 3
     dropout = 0.2
     batch_size = 512
+#     vocab_size = 200
 
     # optimization parameters
     optimizer = 'rmsprop'
-    training_epochs = 4
+    training_epochs = 3
     epoch_steps = 1
 
     # how we break sentences up
@@ -92,9 +100,26 @@ if __name__ == "__main__":
     # previously maxlen = 40, step = 10 before
 
     # testing
-    test_length = 150
+    test_length = 500
     keep_chars = 50
-
+    
+    parser = argparse.ArgumentParser(description='Train the model on some text.')
+    parser.add_argument('--origin', default=origin,
+                        help='name of the text file to train from')
+    parser.add_argument('--unit_size', type=int, default=unit_size,
+                        help='number of units')
+    parser.add_argument('--maxlen', type=int, default=maxlen,
+                        help='maximum length of sentence')
+#     parser.add_argument('--resume', action='store_true',
+#                         help='resume from previously interrupted training')
+    args = parser.parse_args()
+    
+    origin = args.origin
+    unit_size = args.unit_size
+    maxlen =  args.maxlen
+    
+    print('origin : {}, unit_size : {}, maxlen : {}'.format(origin,unit_size,maxlen))
+    
     # Select source
     if "nietzsche" in origin:
         path = get_file('nietzsche.txt', origin='https://s3.amazonaws.com/text-datasets/nietzsche.txt')
@@ -120,6 +145,7 @@ if __name__ == "__main__":
     num_chars = len(chars)
     print('characters: ', chars)
     print('total characters in vocabulary:', num_chars)
+    vocab_size = num_chars
 
     # dictionaries to convert characters to numbers and vice-versa
     try : 
@@ -154,15 +180,22 @@ if __name__ == "__main__":
     targets = y 
 
               
-    ##### start building model
+##### start building model
     print('Building model...')
     
     try : 
-        model = load_model("saved_models/{}.h5".format(origin))
+        model = load_model("saved_models/{}_usize{}_maxlen{}.h5".format(origin,unit_size,maxlen))
         print('Loading existing model')
     except Exception as e:
         print('Not able to load model : {}'.format(e))        
-        model = build_model(unit_size, num_chars,maxlen,batch_size,rtype = rtype)
+        model = build_model(unit_size,
+                            num_chars,
+                            maxlen,
+                            batch_size,
+                            vocab_size,
+                            num_layers,
+                            dropout,
+                            rtype = rtype)
         model.compile(optimizer=optimizer,
                       loss='categorical_crossentropy',
                       metrics=['accuracy'])
@@ -172,18 +205,17 @@ if __name__ == "__main__":
 
     
     
-    # saves generated text in file
-    with open("generated/{}_{}.txt".format(origin,rtype), "w") as outfile :
+# saves generated text in file
+    with open("generated/{}_usize{}_maxlen{}.txt".format(origin,unit_size,maxlen), "w") as outfile :
         # -----Training-----
         for i in range(0,training_epochs,epoch_steps):
             history = model.fit(sentences, targets, batch_size=batch_size, epochs=epoch_steps, verbose=1)
-            
-            
+
             print('-' * 10 + ' Iteration: {} '.format(i) + '-' * 10)
             outfile.write("\n" + '-' * 10 + ' Iteration: {} '.format(i) + '-' * 10 + "\n")
             
             print('loss is {}'.format(history.history['loss'][0]))
-            outfile.write('loss is {}'.format(history.history['loss'][0]))
+            outfile.write('loss is {}'.format(history.history['loss'][0])+ "\n")
             
             if i>0:
                 for temperature in [0.35]:
@@ -193,10 +225,10 @@ if __name__ == "__main__":
                                                   temperature=temperature,
                                                   test_length=test_length,
                                                   keep_chars=keep_chars)
-                    output = "Temperature: {} Generated string: {}".format(temperature, generated_string)
+                    output = "Temperature: {}, generated string:\n{}".format(temperature, generated_string)
                     print(output)
                     outfile.write(output + "\n")
                     outfile.flush()
 
 
-    model.save("saved_models/{}.h5".format(origin))
+    model.save("saved_models/{}_usize{}_maxlen{}.h5".format(origin,unit_size,maxlen))

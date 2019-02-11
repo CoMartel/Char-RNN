@@ -7,7 +7,7 @@ import pickle
 
 # Parameters
 # to_load = "nietzsche"
-origin = "full_pandas_vocab200"
+origin = "full_pandas_vocab50"
 length = 2000
 keep_chars = 50
 
