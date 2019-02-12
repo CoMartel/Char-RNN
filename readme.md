@@ -1,41 +1,19 @@
-# Text Generation Fun
+# char-rnn with keras
 
-## Installation
+char-rnn is a recurrent neural networks for generating texts, characters by characters, based on [Andrej Karpathy's article](http://karpathy.github.io/2015/05/21/rnn-effectiveness)
 
-Install [Anaconda](https://www.continuum.io/what-is-anaconda).
+In this version, I have added support for training on all of the python files of Pandas, but you can change the source file and train on something else.
 
-	conda create --name tensorflow python=3 keras tensorflow
-
-and activate your newly created environment. 
-
-	source activate tensorflow	
-
-If you want to install Tensorflow with GPU support (which can support much faster training), you can do the following:
-
-	pip install --upgrade tfBinaryURL
-
-where tfBinaryURL can be found on the Tensorflow [website](https://www.tensorflow.org/install/install_linux#the_url_of_the_tensorflow_python_package). Alternatively,
-
-	conda install tensorflow-gpu
-
-may work as well.
-
-This is a work in progress. Feel free to make suggestions and/or ask questions!
+## Training : 
+This is an example call for training : 
+'''bash
+$ python train_model.py --unit_size 256 --maxlen 120 --num_layers 3
+'''
+## generating text :
+The `load_trained_model.py` file can be called to generate some text based on a trained model
 
 
-### Other applications / extensions
-https://larseidnes.com/2015/10/13/auto-generating-clickbait-with-recurrent-neural-networks/
-
-Generating sports headlines
-
-Combing two different sources
-
-### Credits
+## Credits
 Keras library example
-
-mineshmathew repo:
-
-Obama dataset: https://github.com/samim23/obama-rnn
-
-### TODOs
-word level generation?
+This is initially based on https://github.com/michaelrzhang/Char-RNN
+re-factoring inspired by https://github.com/karpathy/char-rnn and https://github.com/ekzhang/char-rnn-keras
