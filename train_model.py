@@ -5,11 +5,20 @@ from keras.layers import Dense, Activation, Dropout
 from keras.layers import LSTM,GRU, Embedding
 from keras.layers.wrappers import TimeDistributed
 from keras.utils.data_utils import get_file
+from keras.callbacks import ModelCheckpoint,EarlyStopping
+
+from sklearn.model_selection import train_test_split
+
+import matplotlib.pyplot as plt
+
 import numpy as np
 import random
 import pickle
 import sys
 import argparse
+import os
+import gc
+
 
 
 # Loosely follows Karparthy, Keras library example, and mineshmathew's repo
@@ -69,40 +78,59 @@ def build_model(unit_size,
     model.add(Activation('softmax'))
     return model
 
+def plot_history(history,model_name):
+    # summarize history for accuracy
+    plt.figure()
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.savefig('./figures/{}_acc_history.png'.format(model_name), bbox_inches='tight')
+    plt.close()
+    # summarize history for loss
+    plt.figure()
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.savefig('./figures/{}_loss_history.png'.format(model_name), bbox_inches='tight')
+    plt.close()
+#     plt.show()
 
 if __name__ == "__main__":
 
-    # Parameters
+### Parameters
 
-    # Random seed. Change to get different training results / speeds
-    # origin = "obama2"  # used to name files saved as well
-    # origin = "nietzsche"
     origin = "full_pandas"
     seed = 2
 
     # Recurrent unit parameters 
     rtype ='LSTM' # also accepted : 'LSTM', 'GRU'
-    unit_size = 512  # can increase more if using dropout
+    unit_size = 512  
     num_layers = 3
-    dropout = 0.2
-    batch_size = 512
+    dropout = 0
+    batch_size = 256
 #     vocab_size = 200
 
     # optimization parameters
     optimizer = 'rmsprop'
-    training_epochs = 3
-    epoch_steps = 1
+    training_epochs = 10
+#     epoch_steps = 1
 
     # how we break sentences up
-    maxlen = 120 # perhaps better for step not to divide maxlen (to get more overlap) 
+    maxlen = 240 # perhaps better for step not to divide maxlen (to get more overlap) 
     step = 13
-    # increasing maxlen should allow for more coherent thoughts
-    # previously maxlen = 40, step = 10 before
 
     # testing
+    testing = False # set to True if you want to run a test with the trained model
     test_length = 500
     keep_chars = 50
     
+### Setting argument with arg parser. If not specified, take default values above
     parser = argparse.ArgumentParser(description='Train the model on some text.')
     parser.add_argument('--origin', default=origin,
                         help='name of the text file to train from')
@@ -110,6 +138,8 @@ if __name__ == "__main__":
                         help='number of units')
     parser.add_argument('--maxlen', type=int, default=maxlen,
                         help='maximum length of sentence')
+    parser.add_argument('--num_layers', type=int, default=num_layers,
+                        help='number of layers')
 #     parser.add_argument('--resume', action='store_true',
 #                         help='resume from previously interrupted training')
     args = parser.parse_args()
@@ -117,10 +147,16 @@ if __name__ == "__main__":
     origin = args.origin
     unit_size = args.unit_size
     maxlen =  args.maxlen
+    num_layers = args.num_layers
     
-    print('origin : {}, unit_size : {}, maxlen : {}'.format(origin,unit_size,maxlen))
+    model_name = "{}_usize{}_maxlen{}_numlayers{}_dropout{}".format(origin,unit_size,maxlen,num_layers,dropout)
+
+    if not os.path.exists("./saved_models/{}/".format(model_name)):
+        os.makedirs("./saved_models/{}/".format(model_name))
+#     print('origin : {}, unit_size : {}, maxlen : {}, num_layers : {}'.format(origin,unit_size,maxlen,num_layers))
+    print("Model_name : {}".format(model_name))
     
-    # Select source
+### Select source
     if "nietzsche" in origin:
         path = get_file('nietzsche.txt', origin='https://s3.amazonaws.com/text-datasets/nietzsche.txt')
         text = open(path).read().lower()
@@ -140,6 +176,7 @@ if __name__ == "__main__":
     np.random.seed(seed)
     random.seed(seed)
 
+### reading corpus
     print('corpus length:', len(text))
     chars = sorted(list(set(text)))
     num_chars = len(chars)
@@ -147,19 +184,19 @@ if __name__ == "__main__":
     print('total characters in vocabulary:', num_chars)
     vocab_size = num_chars
 
-    # dictionaries to convert characters to numbers and vice-versa
+### dictionaries to convert characters to numbers and vice-versa
     try : 
-        char_to_indices = pickle.load(open("saved_models/{}c2i.p".format(origin), "rb"))
-        indices_to_char = pickle.load(open("saved_models/{}i2c.p".format(origin), "rb"))
+        char_to_indices = pickle.load(open("saved_models/{}_c2i.p".format(origin), "rb"))
+        indices_to_char = pickle.load(open("saved_models/{}_i2c.p".format(origin), "rb"))
         print("loading char_to_indices")
     except Exception as e:
         print('Not able to load char_to_indice : {}'.format(e))
         char_to_indices = dict((c, i) for i, c in enumerate(chars))
         indices_to_char = dict((i, c) for i, c in enumerate(chars))
-        pickle.dump(char_to_indices, open("saved_models/{}c2i.p".format(origin), "wb"))
-        pickle.dump(indices_to_char, open("saved_models/{}i2c.p".format(origin), "wb"))
+        pickle.dump(char_to_indices, open("saved_models/{}_c2i.p".format(origin), "wb"))
+        pickle.dump(indices_to_char, open("saved_models/{}_i2c.p".format(origin), "wb"))
 
-    # cut the text in semi-redundant sequences of maxlen characters 
+### cut the text in semi-redundant sequences of maxlen characters 
     ########### get the sentences
     sentences = []
     targets = []
@@ -174,61 +211,87 @@ if __name__ == "__main__":
 
     y = np.zeros((len(sentences), maxlen, num_chars), dtype=np.bool) # target must be vectorized to match the output dimensions
     for i in range(len(sentences)):
-        target = targets[i]
         for j in range(maxlen):
-            y[i][j][target[j]] = 1
-    targets = y 
-
+            y[i][j][targets[i][j]] = 1
+#     targets = y 
+    del targets, text, idx_text
+    gc.collect()
+    
+    # splitting in train - test 
+    train_sentences, val_sentences, train_targets, val_targets = train_test_split(sentences, y, test_size=0.25, random_state=118)
               
 ##### start building model
     print('Building model...')
     
-    try : 
-        model = load_model("saved_models/{}_usize{}_maxlen{}.h5".format(origin,unit_size,maxlen))
-        print('Loading existing model')
-    except Exception as e:
-        print('Not able to load model : {}'.format(e))        
-        model = build_model(unit_size,
-                            num_chars,
-                            maxlen,
-                            batch_size,
-                            vocab_size,
-                            num_layers,
-                            dropout,
-                            rtype = rtype)
-        model.compile(optimizer=optimizer,
-                      loss='categorical_crossentropy',
-                      metrics=['accuracy'])
+#     try : 
+#         model = load_model("saved_models/{}_usize{}_maxlen{}_numlayers{}.h5".format(origin,unit_size,maxlen,num_layers))
+#         print('Loading existing model')
+#     except Exception as e:
+#         print('Not able to load model : {}'.format(e))        
+    model = build_model(unit_size,
+                        num_chars,
+                        maxlen,
+                        batch_size,
+                        vocab_size,
+                        num_layers,
+                        dropout,
+                        rtype = rtype)
+    
+    model.compile(optimizer=optimizer,
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
               
     print(model.summary())
+    
+    filepath="saved_models/{}/".format(model_name)
+    filepath+="weights-{epoch:02d}-{val_acc:.2f}.h5"
+    checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+    early_stopping = EarlyStopping(monitor='val_acc',min_delta=0,patience=2,verbose=0, mode='auto')
+    callbacks_list = [checkpoint,early_stopping]
     print('...model built!')
 
     
     
 # saves generated text in file
-    with open("generated/{}_usize{}_maxlen{}.txt".format(origin,unit_size,maxlen), "w") as outfile :
-        # -----Training-----
-        for i in range(0,training_epochs,epoch_steps):
-            history = model.fit(sentences, targets, batch_size=batch_size, epochs=epoch_steps, verbose=1)
+    
+    # -----Training-----
 
-            print('-' * 10 + ' Iteration: {} '.format(i) + '-' * 10)
-            outfile.write("\n" + '-' * 10 + ' Iteration: {} '.format(i) + '-' * 10 + "\n")
-            
-            print('loss is {}'.format(history.history['loss'][0]))
-            outfile.write('loss is {}'.format(history.history['loss'][0])+ "\n")
-            
+#         for i in range(0,training_epochs,epoch_steps):
+    history = model.fit(train_sentences,
+                        train_targets,
+                        batch_size=batch_size,
+                        epochs=training_epochs,
+                        validation_data = (val_sentences,val_targets),
+                        callbacks=callbacks_list,
+                        verbose=1)
+    
+    model.save("saved_models/{}/final.h5".format(model_name))
+    
+    plot_history(history,model_name)
+#     print('-' * 10 + ' Iteration: {} '.format(i) + '-' * 10)
+#     outfile.write("\n" + '-' * 10 + ' Iteration: {} '.format(i) + '-' * 10 + "\n")
+
+#     print('loss is {}'.format(history.history['loss'][0]))
+#     outfile.write('loss is {}'.format(history.history['loss'][0])+ "\n")
+    if testing:   
+        with open("generated/{}.txt".format(model_name), "w",encoding="utf-8") as outfile :
             if i>0:
-                for temperature in [0.35]:
+                for temperature in [0.35,1]:
                     generated_string = test_model(model,
                                                   char_to_indices=char_to_indices,
                                                   indices_to_char=indices_to_char,
                                                   temperature=temperature,
                                                   test_length=test_length,
                                                   keep_chars=keep_chars)
-                    output = "Temperature: {}, generated string:\n{}".format(temperature, generated_string)
-                    print(output)
-                    outfile.write(output + "\n")
-                    outfile.flush()
+                    try:
+                        output = "Temperature: {}, generated string:\n{}".format(temperature, generated_string)
+                        print(output)
+                        outfile.write(output + "\n")
+                        outfile.flush()
+                    except Exception as e :
+                        print(e)
+                        # if something goes wrong in the output
+                        pass
 
 
-    model.save("saved_models/{}_usize{}_maxlen{}.h5".format(origin,unit_size,maxlen))
+    
