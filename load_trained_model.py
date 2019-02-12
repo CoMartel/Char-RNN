@@ -6,17 +6,17 @@ from keras.models import load_model
 import pickle
 
 # Parameters
-# to_load = "nietzsche"
-origin = "full_pandas_vocab50"
-length = 2000
+origin = "full_pandas"
+model_name = "full_pandas_usize512_maxlen240_numlayers3_dropout0"
+length = 10000
 keep_chars = 50
 
-outfile = open("generated/{}_long.txt".format(origin), "w")
-model = load_model("saved_models/{}.h5".format(origin))
+
+model = load_model("saved_models/{}/final.h5".format(model_name))
 char_to_indices = pickle.load(open("saved_models/{}c2i.p".format(origin), "rb"))
 indices_to_char = pickle.load(open("saved_models/{}i2c.p".format(origin), "rb"))
 
-for temperature in [0.2, 0.35, 0.5,1]:
+for temperature in [0.2, 0.35, 0.5,1,2,3]:
     generated_string = test_model(model=model,
                                   char_to_indices=char_to_indices,
                                   indices_to_char=indices_to_char,
@@ -24,8 +24,8 @@ for temperature in [0.2, 0.35, 0.5,1]:
                                   temperature=temperature,
                                   test_length=length,
                                   keep_chars=keep_chars)
-    output = "Temperature: {} Generated string: {}".format(temperature, generated_string)
-    print(output)
-    outfile.write(output + "\n")
-    outfile.flush()
-outfile.close()
+    
+    with open("generated/{}.txt".format(model_name), "a",encoding="utf-8") as outfile:
+        output = "Temperature: {} Generated string: \n{}\n".format(temperature, generated_string)
+        print(output)
+        outfile.write(output + "\n")
