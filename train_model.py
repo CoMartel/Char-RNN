@@ -26,9 +26,12 @@ import gc
 
 
 def sample(preds, temperature=1.0):
-    # helper function to sample an index from a probability array (from Keras library)
+    """
+    helper function to sample an index from a probability array (from Keras library)
+    increasing the temperature flttens the characters probability distribution, and allow for more randomness
+    """
     preds = np.asarray(preds).astype('float64')
-    preds = np.log(preds + 1e-8) / temperature  # Taking the log should be optional? add fudge factor to avoid log(0)
+    preds = np.log(preds + 1e-8) / temperature
     exp_preds = np.exp(preds)
     preds = exp_preds / np.sum(exp_preds)
     probas = np.random.multinomial(1, preds, 1)
@@ -62,9 +65,7 @@ def build_model(unit_size,
                 dropout,
                 rtype ='LSTM'):
     model = Sequential()
-    model.add(Embedding(num_chars, vocab_size)) #,batch_input_shape=(batch_size, maxlen)))
-#                         ,batch_input_shape=(128, 120)))
-#                         input_length=maxlen))
+    model.add(Embedding(num_chars, vocab_size))
     for i in range(num_layers):
         if rtype == 'LSTM':
             model.add(LSTM(unit_size, return_sequences=True))
@@ -99,27 +100,28 @@ def plot_history(history,model_name):
     plt.legend(['train', 'test'], loc='upper left')
     plt.savefig('./figures/{}_loss_history.png'.format(model_name), bbox_inches='tight')
     plt.close()
-#     plt.show()
+
 
 if __name__ == "__main__":
 
 ### Parameters
 
-    origin = "full_pandas"
-    seed = 2
+    origin = "full_pandas_with_import" # select the original source
+    seed = 2 # random seed
 
     # Recurrent unit parameters 
     rtype ='LSTM' # also accepted : 'LSTM', 'GRU'
     unit_size = 512  
     num_layers = 3
     dropout = 0
-    batch_size = 256
+    batch_size = 512
 #     vocab_size = 200
 
     # optimization parameters
     optimizer = 'rmsprop'
-    training_epochs = 10
-#     epoch_steps = 1
+    training_epochs = 50
+    patience = 2
+    test_size = 0.25
 
     # how we break sentences up
     maxlen = 240 # perhaps better for step not to divide maxlen (to get more overlap) 
@@ -134,26 +136,27 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train the model on some text.')
     parser.add_argument('--origin', default=origin,
                         help='name of the text file to train from')
+    parser.add_argument('--rtype', default=rtype,
+                        help='type of recurrent cell : LSTM or GRU')
     parser.add_argument('--unit_size', type=int, default=unit_size,
                         help='number of units')
     parser.add_argument('--maxlen', type=int, default=maxlen,
                         help='maximum length of sentence')
     parser.add_argument('--num_layers', type=int, default=num_layers,
                         help='number of layers')
-#     parser.add_argument('--resume', action='store_true',
-#                         help='resume from previously interrupted training')
     args = parser.parse_args()
     
     origin = args.origin
+    rtype = args.rtype
     unit_size = args.unit_size
     maxlen =  args.maxlen
     num_layers = args.num_layers
     
     model_name = "{}_usize{}_maxlen{}_numlayers{}_dropout{}".format(origin,unit_size,maxlen,num_layers,dropout)
 
-    if not os.path.exists("./saved_models/{}/".format(model_name)):
+    if not os.path.exists("./saved_models/{}/".format(model_name)): # create new folder for the model
         os.makedirs("./saved_models/{}/".format(model_name))
-#     print('origin : {}, unit_size : {}, maxlen : {}, num_layers : {}'.format(origin,unit_size,maxlen,num_layers))
+
     print("Model_name : {}".format(model_name))
     
 ### Select source
@@ -197,7 +200,6 @@ if __name__ == "__main__":
         pickle.dump(indices_to_char, open("saved_models/{}_i2c.p".format(origin), "wb"))
 
 ### cut the text in semi-redundant sequences of maxlen characters 
-    ########### get the sentences
     sentences = []
     targets = []
     idx_text = [char_to_indices[c] for c in text]
@@ -213,21 +215,18 @@ if __name__ == "__main__":
     for i in range(len(sentences)):
         for j in range(maxlen):
             y[i][j][targets[i][j]] = 1
-#     targets = y 
-    del targets, text, idx_text
-    gc.collect()
+
+### split in train - test
+    train_sentences, val_sentences, train_targets, val_targets = train_test_split(sentences, y, test_size=test_size, random_state=118)
     
-    # splitting in train - test 
-    train_sentences, val_sentences, train_targets, val_targets = train_test_split(sentences, y, test_size=0.25, random_state=118)
-              
+### release some memory
+    del targets, text, idx_text,sentences, y
+    gc.collect()       
+    
 ##### start building model
     print('Building model...')
-    
-#     try : 
-#         model = load_model("saved_models/{}_usize{}_maxlen{}_numlayers{}.h5".format(origin,unit_size,maxlen,num_layers))
-#         print('Loading existing model')
-#     except Exception as e:
-#         print('Not able to load model : {}'.format(e))        
+#     model = load_model("saved_models/full_pandas_with_import_usize512_maxlen240_numlayers3_dropout0/weights-02-0.82.h5")
+     
     model = build_model(unit_size,
                         num_chars,
                         maxlen,
@@ -246,17 +245,13 @@ if __name__ == "__main__":
     filepath="saved_models/{}/".format(model_name)
     filepath+="weights-{epoch:02d}-{val_acc:.2f}.h5"
     checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-    early_stopping = EarlyStopping(monitor='val_acc',min_delta=0,patience=2,verbose=0, mode='auto')
+    early_stopping = EarlyStopping(monitor='val_acc',min_delta=0,patience=patience,verbose=0, mode='auto')
     callbacks_list = [checkpoint,early_stopping]
     print('...model built!')
 
-    
-    
-# saves generated text in file
-    
-    # -----Training-----
 
-#         for i in range(0,training_epochs,epoch_steps):
+    
+### training
     history = model.fit(train_sentences,
                         train_targets,
                         batch_size=batch_size,
@@ -268,30 +263,22 @@ if __name__ == "__main__":
     model.save("saved_models/{}/final.h5".format(model_name))
     
     plot_history(history,model_name)
-#     print('-' * 10 + ' Iteration: {} '.format(i) + '-' * 10)
-#     outfile.write("\n" + '-' * 10 + ' Iteration: {} '.format(i) + '-' * 10 + "\n")
 
-#     print('loss is {}'.format(history.history['loss'][0]))
-#     outfile.write('loss is {}'.format(history.history['loss'][0])+ "\n")
     if testing:   
         with open("generated/{}.txt".format(model_name), "w",encoding="utf-8") as outfile :
-            if i>0:
-                for temperature in [0.35,1]:
-                    generated_string = test_model(model,
-                                                  char_to_indices=char_to_indices,
-                                                  indices_to_char=indices_to_char,
-                                                  temperature=temperature,
-                                                  test_length=test_length,
-                                                  keep_chars=keep_chars)
-                    try:
-                        output = "Temperature: {}, generated string:\n{}".format(temperature, generated_string)
-                        print(output)
-                        outfile.write(output + "\n")
-                        outfile.flush()
-                    except Exception as e :
-                        print(e)
-                        # if something goes wrong in the output
-                        pass
-
-
-    
+            for temperature in [0.35,1]:
+                generated_string = test_model(model,
+                                              char_to_indices=char_to_indices,
+                                              indices_to_char=indices_to_char,
+                                              temperature=temperature,
+                                              test_length=test_length,
+                                              keep_chars=keep_chars)
+                try:
+                    output = "Temperature: {}, generated string:\n{}".format(temperature, generated_string)
+                    print(output)
+                    outfile.write(output + "\n")
+                    outfile.flush()
+                except Exception as e :
+                    print(e)
+                    # if something goes wrong in the output
+                    pass

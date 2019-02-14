@@ -7,11 +7,12 @@ In this version, I have added support for training on all of the python files of
 ## Training : 
 This is an example call for training : 
 ```bash
-$ python train_model.py --unit_size 256 --maxlen 120 --num_layers 3
+$ python train_model.py --origin full_pandas --rtype LSTM --unit_size 512 --maxlen 240 --num_layers 3
 ```
 ## generating text :
 The `load_trained_model.py` file can be called to generate some text based on a trained model
 
+There is some examples of generated text in /generated, using a model trained on a mix of pandas and django
 
 ## Credits
 Keras library example
