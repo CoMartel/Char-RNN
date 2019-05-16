@@ -33,7 +33,7 @@ def sample(preds, temperature=1.0):
     preds = np.asarray(preds).astype('float64')
     preds = np.log(preds + 1e-8) / temperature
     exp_preds = np.exp(preds)
-    preds = exp_preds / np.sum(exp_preds)
+    preds = exp_preds / np.sum(exp_preds) 
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
 
@@ -46,14 +46,14 @@ def test_model(model, char_to_indices, indices_to_char, seed_string="def ", temp
     """
     num_chars = len(char_to_indices.keys())
     for i in range(test_length):
-        test_in = np.zeros((1, len(seed_string[-keep_chars:])))
-        for t, char in enumerate(seed_string[-keep_chars:]):
+        test_in = np.zeros((1, len(seed_string[-keep_chars:]))) # init input vector
+        for t, char in enumerate(seed_string[-keep_chars:]): # convert char to embedding
             test_in[0, t] = char_to_indices[char]
         # input 'goodby', desired output is 'oodbye' # possible todo: show that this holds for the model
-        entire_prediction = model.predict(test_in, verbose=0)[0]
-        next_index = sample(entire_prediction[-1], temperature)
-        next_char = indices_to_char[next_index]
-        seed_string = seed_string + next_char
+        entire_prediction = model.predict(test_in, verbose=0)[0] # output is as sequence of predictions (shape (1,keep_chars,num_chars)
+        next_index = sample(entire_prediction[-1], temperature) # draw from the distribution of the last char in the string
+        next_char = indices_to_char[next_index] # convert indice back to char
+        seed_string = seed_string + next_char # re-construct the string
     return seed_string
 
 def build_model(unit_size,
